@@ -1,0 +1,10 @@
+build:
+  version: "3.0"
+
+cards:
+  message: "Welcome to Cards related Local APIs "
+  contactDetails:
+    name: "{cipher}9aac31180853364fcfe9ae158cc357ff460f14751e890d6a284586552926b9e3 - Local Owner"
+    email: "{cipher}f66659e5111eda62ce42a7c1f8c5a44be945ba3081f1f1f4d6e686768b64341c515ded14ce6927374ee82f214bbf2068"
+  onCallSupport:
+    - (234) 392-4829

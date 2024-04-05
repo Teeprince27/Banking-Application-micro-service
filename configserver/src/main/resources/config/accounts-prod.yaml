@@ -1,0 +1,10 @@
+build:
+  version: "1.0"
+
+accounts:
+  message: "Test Tobi Welcome to accounts related production APIs, Spring Bus Test "
+  contactDetails:
+    name: "{cipher}d9990cfba9b538c52f58d33cfea9b15b3717f2cc689c816081cf4e8352a1744523975a27e005ba55416cf617b8b71506"
+    email: "{cipher}477a7538cdc0a267873cd1f24720481d18178392db8e00023a36621d4c1fe16e7b706be646e73f99e21fa21a6264a5e5"
+  onCallSupport:
+    - (234) 392-4829

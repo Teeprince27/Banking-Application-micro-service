@@ -1,0 +1,10 @@
+build:
+  version: "2.0"
+
+cards:
+  message: "Welcome to Cards related QA APIs "
+  contactDetails:
+    name: "Ajayi Temitope - QA Owner"
+    email: "topesamuelajayi@gmail.com"
+  onCallSupport:
+    - (234) 392-4829

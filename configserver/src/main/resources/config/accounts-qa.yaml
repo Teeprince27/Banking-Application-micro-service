@@ -1,0 +1,10 @@
+build:
+  version: "2.0"
+
+accounts:
+  message: "Welcome to accounts related QA APIs "
+  contactDetails:
+    name: "{cipher}ca542602b7ae29063862313f8ce72f560c82d93c257a9792e549e06e04b395e019f373c8d215df9cfdd13d0284688226"
+    email: "{cipher}477a7538cdc0a267873cd1f24720481d18178392db8e00023a36621d4c1fe16e7b706be646e73f99e21fa21a6264a5e5"
+  onCallSupport:
+    - (234) 392-4829

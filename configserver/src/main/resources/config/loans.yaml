@@ -1,0 +1,10 @@
+build:
+  version: "3.0"
+
+loans:
+  message: "Welcome to loans related Local APIs "
+  contactDetails:
+    name: "Ajayi Temitope - Local Owner"
+    email: "topesamuelajayi@gmail.com"
+  onCallSupport:
+    - (234) 392-4829

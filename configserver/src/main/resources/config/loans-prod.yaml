@@ -1,0 +1,10 @@
+build:
+  version: "1.0"
+
+loans:
+  message: "Test Tobi Welcome to loans related Production APIs "
+  contactDetails:
+    name: "Ajayi Temitope - Production Owner"
+    email: "topesamuelajayi@gmail.com"
+  onCallSupport:
+    - (234) 392-4829
