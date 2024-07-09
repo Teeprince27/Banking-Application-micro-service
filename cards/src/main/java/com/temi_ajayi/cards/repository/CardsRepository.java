@@ -14,4 +14,5 @@ public interface CardsRepository extends JpaRepository<Cards, Long> {
     Cards findAllByCardNumber(String cardNumber);
     Optional<Cards> findByCardNumber(String cardNumber);
 
+    boolean existsByMobileNumber(String mobileNumber);
 }

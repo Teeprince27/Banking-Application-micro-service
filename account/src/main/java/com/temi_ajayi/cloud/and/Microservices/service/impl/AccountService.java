@@ -2,7 +2,8 @@ package com.temi_ajayi.cloud.and.Microservices.service.impl;
 
 import com.temi_ajayi.cloud.and.Microservices.constant.AccountsConstant;
 import com.temi_ajayi.cloud.and.Microservices.dto.HeaderBase;
-import com.temi_ajayi.cloud.and.Microservices.dto.request.AccountsDto;
+import com.temi_ajayi.cloud.and.Microservices.dto.request.AccountResponseDto;
+import com.temi_ajayi.cloud.and.Microservices.dto.request.AccountsMsgDto;
 import com.temi_ajayi.cloud.and.Microservices.dto.request.CustomerDto;
 import com.temi_ajayi.cloud.and.Microservices.dto.response.CustomerResponseDto;
 import com.temi_ajayi.cloud.and.Microservices.dto.response.FetchCustomerResponseDto;
@@ -13,7 +14,11 @@ import com.temi_ajayi.cloud.and.Microservices.repository.CustomerRepository;
 import com.temi_ajayi.cloud.and.Microservices.service.IAccountService;
 import com.temi_ajayi.cloud.and.Microservices.utils.ResponseCodes;
 import lombok.AllArgsConstructor;
+
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -22,11 +27,14 @@ import java.util.Random;
 
 @Service
 @AllArgsConstructor
-@Slf4j
+
 public class AccountService implements IAccountService {
+
+    private static final Logger log = LoggerFactory.getLogger(AccountService.class);
 
     private final AccountRepository accountRepository;
     private final CustomerRepository customerRepository;
+    private final StreamBridge streamBridge;
 
 
     @Override
@@ -51,11 +59,14 @@ public class AccountService implements IAccountService {
 
             }
             Customer savedCustomer = customerRepository.save(customer);
-            accountRepository.save(createNewAccount(savedCustomer));
+            Accounts savedAccount = accountRepository.save(createNewAccount(savedCustomer));
+
+            sendCommunication(savedAccount, savedCustomer);
 
             headerBase.setResponseCode(ResponseCodes.SUCCESS_CODE);
             headerBase.setResponseMessage(AccountsConstant.MESSAGE_201);
             customerResponseDto.setHeaderBase(headerBase);
+            customerResponseDto.setMobileNumber(savedCustomer.getMobileNumber());
             return ResponseEntity.ok().body(customerResponseDto);
 
         }catch (Exception exception){
@@ -69,6 +80,14 @@ public class AccountService implements IAccountService {
             return ResponseEntity.badRequest().body(customerResponseDto);
         }
 
+    }
+
+    private void sendCommunication(Accounts account, Customer customer) {
+        var accountsMsgDto = new AccountsMsgDto(account.getAccountNumber(), customer.getName(),
+                customer.getEmail(), customer.getMobileNumber());
+        log.info("Sending Communication request for the details: {}", accountsMsgDto);
+        var result = streamBridge.send("sendCommunication-out-0", accountsMsgDto);
+        log.info("Is the Communication request successfully triggered ? : {}", result);
     }
 
     private Accounts createNewAccount(Customer customer){
@@ -85,6 +104,13 @@ public class AccountService implements IAccountService {
     public ResponseEntity<FetchCustomerResponseDto> fetchAccount(CustomerDto customerDto) {
         FetchCustomerResponseDto responseDto = new FetchCustomerResponseDto();
         HeaderBase headerBase = new HeaderBase();
+        boolean checkCustomer = customerRepository.existsByMobileNumber(customerDto.getMobileNumber());
+        if(!checkCustomer){
+            headerBase.setResponseCode(ResponseCodes.DOES_NOT_EXIST_CODE);
+            headerBase.setResponseMessage("Customer with Mobile number  " + customerDto.getMobileNumber() + ResponseCodes.NOT_FOUND_MESSAGE);
+            responseDto.setHeaderBase(headerBase);
+            return ResponseEntity.ok().body(responseDto);
+        }
 
         try {
             Customer customer = customerRepository.findByMobileNumber(customerDto.getMobileNumber());
@@ -93,7 +119,7 @@ public class AccountService implements IAccountService {
             responseDto.setEmail(customer.getEmail());
             responseDto.setMobileNumber(customer.getMobileNumber());
             responseDto.setName(customer.getName());
-            responseDto.setAccountsDto(getAccount(accounts));
+            responseDto.setAccountResponseDto(getAccount(accounts));
 
             return ResponseEntity.ok().body(responseDto);
         }catch (Exception exception){
@@ -103,8 +129,8 @@ public class AccountService implements IAccountService {
             return ResponseEntity.ok().body(responseDto);
         }
     }
-    private AccountsDto getAccount(Accounts accounts){
-        AccountsDto newAccount = new AccountsDto();
+    private AccountResponseDto getAccount(Accounts accounts){
+        AccountResponseDto newAccount = new AccountResponseDto();
         newAccount.setAccountNumber(accounts.getAccountNumber());
         newAccount.setAccountType(accounts.getAccountType());
         newAccount.setBranchAddress(accounts.getBranchAddress());

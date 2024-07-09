@@ -5,10 +5,14 @@ spring:
     name: "cards"
   profiles:
     active: "prod"
+#  datasource:
+#    url: jdbc:mysql://localhost:3309/cardsdb?createDatabaseIfNotExist=true
+#    username: root
+#    password: root
   datasource:
-    url: jdbc:mysql://localhost:3309/cardsdb?createDatabaseIfNotExist=true
-    username: root
-    password: root
+    url: jdbc:mysql://localhost:3306/cardsdb?createDatabaseIfNotExist=true
+    username: springstudent
+    password: springstudent
   jpa:
     show-sql: true
     hibernate:
@@ -18,17 +22,37 @@ spring:
       mode: always
   config:
     import: "optional:configserver:http://localhost:8071/"
-  rabbitmq:
-    hostname: "localhost"
-    port: 5672
-    password: "guest"
-    username: "guest"
+#  rabbitmq:
+#    hostname: "localhost"
+#    port: 5672
+#    password: "guest"
+#    username: "guest"
 
 management:
  endpoints:
   web:
    exposure:
     include: "*"
+ endpoint:
+   shutdown:
+     enabled: true
+ info:
+   env:
+     enabled: true
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8070/eureka/
+info:
+  app:
+    name: "cards"
+    description: "Basic Bank Cards Application"
+    version: "1.0.0"
 
 
 

@@ -75,25 +75,34 @@ public class LoansServiceImpl implements ILoansServices {
         FetchLoansResponseDto responseDto = new FetchLoansResponseDto();
         HeaderBase headerBase = new HeaderBase();
 
-        try {
-            Loans loans = loansRepository.findByMobileNumber(loansRequestDto.getMobileNumber());
-
-            responseDto.setLoanType(loans.getLoanType());
-            responseDto.setLoanNumber(loans.getLoanNumber());
-            responseDto.setMobileNumber(loans.getMobileNumber());
-            responseDto.setTotalLoan(loans.getTotalLoan());
-            responseDto.setAmountPaid(loans.getAmountPaid());
-            responseDto.setOutstandingAmount(loans.getOutstandingAmount());
-
-            headerBase.setResponseMessage(ResponseCodes.SUCCESS_MESSAGE);
-            headerBase.setResponseCode(ResponseCodes.SUCCESS_CODE);
+        boolean checkLoan = loansRepository.existsByMobileNumber(loansRequestDto.getMobileNumber());
+        if(!checkLoan){
+            headerBase.setResponseCode(ResponseCodes.DOES_NOT_EXIST_CODE);
+            headerBase.setResponseMessage("Customer with Mobile number  " + loansRequestDto.getMobileNumber() + ResponseCodes.NOT_FOUND_MESSAGE);
             responseDto.setHeaderBase(headerBase);
             return ResponseEntity.ok().body(responseDto);
-        }catch (Exception exception){
-            headerBase.setResponseMessage(ResponseCodes.FAILED_MESSAGE);
-            headerBase.setResponseMessage(ResponseCodes.FAILED_MESSAGE);
-            responseDto.setHeaderBase(headerBase);
-            return ResponseEntity.ok().body(responseDto);
+        }else {
+
+            try {
+                Loans loans = loansRepository.findByMobileNumber(loansRequestDto.getMobileNumber());
+
+                responseDto.setLoanType(loans.getLoanType());
+                responseDto.setLoanNumber(loans.getLoanNumber());
+                responseDto.setMobileNumber(loans.getMobileNumber());
+                responseDto.setTotalLoan(loans.getTotalLoan());
+                responseDto.setAmountPaid(loans.getAmountPaid());
+                responseDto.setOutstandingAmount(loans.getOutstandingAmount());
+
+                headerBase.setResponseMessage(ResponseCodes.SUCCESS_MESSAGE);
+                headerBase.setResponseCode(ResponseCodes.SUCCESS_CODE);
+                responseDto.setHeaderBase(headerBase);
+                return ResponseEntity.ok().body(responseDto);
+            } catch (Exception exception) {
+                headerBase.setResponseCode(ResponseCodes.FAILED_CODE);
+                headerBase.setResponseMessage(ResponseCodes.FAILED_MESSAGE);
+                responseDto.setHeaderBase(headerBase);
+                return ResponseEntity.ok().body(responseDto);
+            }
         }
     }
 

@@ -37,7 +37,7 @@ public class CardsServicesImpl implements ICardsServices {
             }else {
                 cardsRepository.save(createNewCard(cardsRequestDto));
                 headerBase.setResponseCode(ResponseCodes.SUCCESS_CODE);
-                headerBase.setResponseMessage(ResponseCodes.SUCCESS_CODE);
+                headerBase.setResponseMessage(ResponseCodes.SUCCESS_MESSAGE);
                 cardsResponseDto.setHeaderBase(headerBase);
                 return ResponseEntity.ok().body(cardsResponseDto);
 
@@ -66,26 +66,35 @@ public class CardsServicesImpl implements ICardsServices {
    public ResponseEntity<FetchCardsResponseDto> fetchCard(CardsRequestDto cardsRequestDto){
         FetchCardsResponseDto cardsResponseDto = new FetchCardsResponseDto();
         HeaderBase headerBase = new HeaderBase();
-        try{
 
-            Cards cards = cardsRepository.findAllByMobileNumber(cardsRequestDto.getMobileNumber());
-
-            cardsResponseDto.setCardNumber(cards.getCardNumber());
-            cardsResponseDto.setCardType(cards.getCardType());
-            cardsResponseDto.setAmountUsed(cards.getAmountUsed());
-            cardsResponseDto.setTotalLimit(cards.getTotalLimit());
-            cardsResponseDto.setAvailableAmount(cards.getAvailableAmount());
-            cardsResponseDto.setMobileNumber(cards.getMobileNumber());
-
-            headerBase.setResponseCode(ResponseCodes.SUCCESS_CODE);
-            headerBase.setResponseMessage(ResponseCodes.SUCCESS_MESSAGE);
+        boolean cardExist = cardsRepository.existsByMobileNumber(cardsRequestDto.getMobileNumber());
+        if(!cardExist){
+            headerBase.setResponseCode(ResponseCodes.DOES_NOT_EXIST_CODE);
+            headerBase.setResponseMessage("Customer with Mobile number  " + cardsRequestDto.getMobileNumber() + ResponseCodes.NOT_FOUND_MESSAGE);
             cardsResponseDto.setHeaderBase(headerBase);
             return ResponseEntity.ok().body(cardsResponseDto);
-        }catch (Exception exception){
-            headerBase.setResponseCode(ResponseCodes.FAILED_CODE);
-            headerBase.setResponseMessage(ResponseCodes.FAILED_MESSAGE);
-            cardsResponseDto.setHeaderBase(headerBase);
-            return ResponseEntity.ok().body(cardsResponseDto);
+        }else {
+            try {
+
+                Cards cards = cardsRepository.findAllByMobileNumber(cardsRequestDto.getMobileNumber());
+
+                cardsResponseDto.setCardNumber(cards.getCardNumber());
+                cardsResponseDto.setCardType(cards.getCardType());
+                cardsResponseDto.setAmountUsed(cards.getAmountUsed());
+                cardsResponseDto.setTotalLimit(cards.getTotalLimit());
+                cardsResponseDto.setAvailableAmount(cards.getAvailableAmount());
+                cardsResponseDto.setMobileNumber(cards.getMobileNumber());
+
+                headerBase.setResponseCode(ResponseCodes.SUCCESS_CODE);
+                headerBase.setResponseMessage(ResponseCodes.SUCCESS_MESSAGE);
+                cardsResponseDto.setHeaderBase(headerBase);
+                return ResponseEntity.ok().body(cardsResponseDto);
+            } catch (Exception exception) {
+                headerBase.setResponseCode(ResponseCodes.FAILED_CODE);
+                headerBase.setResponseMessage(ResponseCodes.FAILED_MESSAGE);
+                cardsResponseDto.setHeaderBase(headerBase);
+                return ResponseEntity.ok().body(cardsResponseDto);
+            }
         }
     }
 
